@@ -6,7 +6,14 @@ import {
 } from "@discordjs/core/http-only";
 import { REST } from "@discordjs/rest";
 import { Webhooks } from "@octokit/webhooks";
-import type { PushEvent, StarEvent, WebhookEvent, WebhookEventName } from "@octokit/webhooks-types";
+import type {
+	CreateEvent,
+	PushEvent,
+	StarEvent,
+	WebhookEvent,
+	WebhookEventName,
+} from "@octokit/webhooks-types";
+import { createComponents } from "../events/create.js";
 import { pushCreatedComponents } from "../events/push.js";
 import { starCreatedComponents } from "../events/star.js";
 
@@ -53,7 +60,9 @@ export default {
 
 		let components: APIMessageTopLevelComponent[] | undefined;
 
-		if (eventType === "push") {
+		if (eventType === "create") {
+			components = createComponents(payload as CreateEvent);
+		} else if (eventType === "push") {
 			const pushEvent = payload as PushEvent;
 
 			// Deleting a branch triggers a push event with no commits.
