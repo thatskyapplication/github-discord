@@ -1,7 +1,13 @@
-import { API, ComponentType, MessageFlags } from "@discordjs/core/http-only";
+import {
+	API,
+	type APIComponentInContainer,
+	ComponentType,
+	MessageFlags,
+} from "@discordjs/core/http-only";
 import { REST } from "@discordjs/rest";
 import { Webhooks } from "@octokit/webhooks";
-import type { WebhookEvent, WebhookEventName } from "@octokit/webhooks-types";
+import type { StarEvent, WebhookEvent, WebhookEventName } from "@octokit/webhooks-types";
+import { starCreateComponents } from "../events/star.js";
 
 interface Env {
 	GITHUB_WEBHOOK_SERCET: string;
@@ -39,15 +45,22 @@ export default {
 		}
 
 		const payload = JSON.parse(text) as WebhookEvent;
+		const containerComponents: APIComponentInContainer[] = [];
+
+		if (eventType === "star") {
+			containerComponents.push(...starCreateComponents(payload as StarEvent));
+		}
+
+		if (containerComponents.length === 0) {
+			containerComponents.push({
+				type: ComponentType.TextDisplay,
+				content: `\`\`\`JSON\n${JSON.stringify({ eventType, ...payload }).slice(0, 50)}\n\`\`\``,
+			});
+		}
 
 		await new API(new REST()).webhooks.execute(env.DISCORD_WEBHOOK_ID, env.DISCORD_WEBHOOK_TOKEN, {
 			allowed_mentions: { parse: [] },
-			components: [
-				{
-					type: ComponentType.TextDisplay,
-					content: `\`\`\`JSON\n${JSON.stringify({ eventType, ...payload }).slice(0, 50)}\n\`\`\``,
-				},
-			],
+			components: [{ type: ComponentType.Container, components: containerComponents }],
 			flags: MessageFlags.IsComponentsV2,
 			with_components: true,
 		});
