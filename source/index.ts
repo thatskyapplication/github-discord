@@ -54,7 +54,14 @@ export default {
 		let components: APIMessageTopLevelComponent[] | undefined;
 
 		if (eventType === "push") {
-			components = pushCreatedComponents(payload as PushEvent);
+			const pushEvent = payload as PushEvent;
+
+			// Deleting a branch triggers a push event with no commits.
+			if (pushEvent.commits.length === 0) {
+				return new Response(null, { status: 204 });
+			}
+
+			components = pushCreatedComponents(pushEvent);
 		} else if (eventType === "star") {
 			const starEvent = payload as StarEvent;
 
