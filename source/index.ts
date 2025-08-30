@@ -6,7 +6,8 @@ import {
 } from "@discordjs/core/http-only";
 import { REST } from "@discordjs/rest";
 import { Webhooks } from "@octokit/webhooks";
-import type { StarEvent, WebhookEvent, WebhookEventName } from "@octokit/webhooks-types";
+import type { PushEvent, StarEvent, WebhookEvent, WebhookEventName } from "@octokit/webhooks-types";
+import { pushCreatedComponents } from "../events/push.js";
 import { starCreatedComponents } from "../events/star.js";
 
 interface Env {
@@ -47,7 +48,9 @@ export default {
 		const payload = JSON.parse(text) as WebhookEvent;
 		let components: APIMessageTopLevelComponent[] | undefined;
 
-		if (eventType === "star") {
+		if (eventType === "push") {
+			components = pushCreatedComponents(payload as PushEvent);
+		} else if (eventType === "star") {
 			const starEvent = payload as StarEvent;
 
 			if (starEvent.action === "deleted") {
