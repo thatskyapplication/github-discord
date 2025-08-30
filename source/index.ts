@@ -46,6 +46,11 @@ export default {
 		}
 
 		const payload = JSON.parse(text) as WebhookEvent;
+
+		if ("repository" in payload && payload.repository.private) {
+			return new Response(null, { status: 204 });
+		}
+
 		let components: APIMessageTopLevelComponent[] | undefined;
 
 		if (eventType === "push") {
