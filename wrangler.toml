@@ -1,0 +1,9 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "github-discord"
+main = "source/index.ts"
+compatibility_date = "2025-08-30"
+workers_dev = false
+routes = [{ pattern = "github-discord.thatskyapplication.com", custom_domain = true }]
+
+[observability]
+enabled = true

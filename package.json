@@ -1,0 +1,25 @@
+{
+	"name": "@thatskyapplication/github-discord",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"test": "tsc",
+		"lint": "biome check",
+		"format": "biome check --write",
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy",
+		"update": "pnpm update --interactive --latest"
+	},
+	"dependencies": {
+		"@discordjs/core": "^2.2.1",
+		"@discordjs/rest": "^2.6.0",
+		"@octokit/webhooks": "^14.1.3"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.2",
+		"@cloudflare/workers-types": "^4.20250830.0",
+		"@octokit/webhooks-types": "^7.6.1",
+		"typescript": "^5.9.2",
+		"wrangler": "^4.33.1"
+	}
+}
