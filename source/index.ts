@@ -7,7 +7,7 @@ import {
 import { REST } from "@discordjs/rest";
 import { Webhooks } from "@octokit/webhooks";
 import type { StarEvent, WebhookEvent, WebhookEventName } from "@octokit/webhooks-types";
-import { starCreateComponents } from "../events/star.js";
+import { starCreatedComponents } from "../events/star.js";
 
 interface Env {
 	GITHUB_WEBHOOK_SERCET: string;
@@ -48,7 +48,13 @@ export default {
 		let components: APIMessageTopLevelComponent[] | undefined;
 
 		if (eventType === "star") {
-			components = starCreateComponents(payload as StarEvent);
+			const starEvent = payload as StarEvent;
+
+			if (starEvent.action === "deleted") {
+				return new Response(null, { status: 204 });
+			}
+
+			components = starCreatedComponents(starEvent);
 		}
 
 		if (!components) {

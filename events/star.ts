@@ -3,9 +3,9 @@ import {
 	ComponentType,
 	SeparatorSpacingSize,
 } from "@discordjs/core/http-only";
-import type { StarEvent } from "@octokit/webhooks-types";
+import type { StarCreatedEvent } from "@octokit/webhooks-types";
 
-export function starCreateComponents(payload: StarEvent): APIMessageTopLevelComponent[] {
+export function starCreatedComponents(payload: StarCreatedEvent): APIMessageTopLevelComponent[] {
 	return [
 		{
 			type: ComponentType.Container,
