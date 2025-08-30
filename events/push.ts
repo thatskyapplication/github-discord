@@ -18,14 +18,22 @@ export function pushCreatedComponents(payload: PushEvent): APIMessageTopLevelCom
 			? `[${payload.before.slice(0, 7)}...${payload.after.slice(0, 7)}](${payload.compare})\n${commits.join("\n")}`
 			: commits[0]!;
 
+	let message = `[${payload.sender.name ?? payload.sender.login}](${payload.sender.html_url})`;
+
+	if (payload.forced) {
+		message += ` force-pushed [${payload.repository.name}:${branch}](${payload.repository.html_url}) to \`${payload.after.slice(0, 7)}\`.`;
+	} else {
+		message += ` committed to [${payload.repository.name}:${branch}](${payload.repository.html_url}).`;
+	}
+
+	message += `\n${commitDescription}`;
+
 	return [
 		{
 			type: ComponentType.Container,
+			accent_color: payload.forced ? 0xfc2a29 : 0x5865f2,
 			components: [
-				{
-					type: ComponentType.TextDisplay,
-					content: `[${payload.sender.name ?? payload.sender.login}](${payload.sender.html_url}) committed to [${payload.repository.name}:${branch}](${payload.repository.html_url}).\n${commitDescription}`,
-				},
+				{ type: ComponentType.TextDisplay, content: message },
 				{
 					type: ComponentType.Separator,
 					divider: true,
