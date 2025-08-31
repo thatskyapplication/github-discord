@@ -1,9 +1,4 @@
-import {
-	API,
-	type APIMessageTopLevelComponent,
-	ComponentType,
-	MessageFlags,
-} from "@discordjs/core/http-only";
+import { API, type APIMessageTopLevelComponent, MessageFlags } from "@discordjs/core/http-only";
 import { REST } from "@discordjs/rest";
 import { Webhooks } from "@octokit/webhooks";
 import type {
@@ -81,20 +76,8 @@ export default withSentry((env) => ({ dsn: env.SENTRY_DATA_SOURCE_NAME, sendDefa
 			}
 
 			components = starCreatedComponents(starEvent);
-		}
-
-		if (!components) {
-			components = [
-				{
-					type: ComponentType.Container,
-					components: [
-						{
-							type: ComponentType.TextDisplay,
-							content: `\`\`\`JSON\n${JSON.stringify({ eventType, ...payload }).slice(0, 50)}\n\`\`\``,
-						},
-					],
-				},
-			];
+		} else {
+			throw new Error(`Unhandled event type: ${eventType}.`);
 		}
 
 		await new API(new REST()).webhooks.execute(env.DISCORD_WEBHOOK_ID, env.DISCORD_WEBHOOK_TOKEN, {
