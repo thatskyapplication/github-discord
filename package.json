@@ -7,7 +7,7 @@
 		"lint": "biome check",
 		"format": "biome check --write",
 		"dev": "wrangler dev",
-		"deploy": "wrangler deploy && sentry-wizard --integration sourcemaps --saas --org thatskyapplication --project github-discord",
+		"deploy": "wrangler deploy",
 		"update": "pnpm update --interactive --latest"
 	},
 	"dependencies": {
@@ -20,7 +20,6 @@
 		"@biomejs/biome": "^2.2.2",
 		"@cloudflare/workers-types": "^4.20250830.0",
 		"@octokit/webhooks-types": "^7.6.1",
-		"@sentry/wizard": "^6.3.0",
 		"typescript": "^5.9.2",
 		"wrangler": "^4.33.1"
 	}
