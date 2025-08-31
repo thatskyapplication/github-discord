@@ -19,7 +19,7 @@ import { pushCreatedComponents } from "../events/push.js";
 import { starCreatedComponents } from "../events/star.js";
 
 interface Env {
-	GITHUB_WEBHOOK_SERCET: string;
+	GITHUB_WEBHOOK_SECRET: string;
 	DISCORD_WEBHOOK_ID: string;
 	DISCORD_WEBHOOK_TOKEN: string;
 	SENTRY_DATA_SOURCE_NAME: string;
@@ -45,7 +45,7 @@ export default withSentry((env) => ({ dsn: env.SENTRY_DATA_SOURCE_NAME, sendDefa
 
 		const signature = request.headers.get("x-hub-signature-256");
 		const text = await request.text();
-		const webhooks = new Webhooks({ secret: env.GITHUB_WEBHOOK_SERCET });
+		const webhooks = new Webhooks({ secret: env.GITHUB_WEBHOOK_SECRET });
 
 		try {
 			await webhooks.verify(text, signature!);
