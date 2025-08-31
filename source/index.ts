@@ -9,9 +9,9 @@ import type {
 	WebhookEventName,
 } from "@octokit/webhooks-types";
 import { withSentry } from "@sentry/cloudflare";
-import { createComponents } from "../events/create.js";
-import { pushCreatedComponents } from "../events/push.js";
-import { starCreatedComponents } from "../events/star.js";
+import { createComponents } from "./events/create.js";
+import { pushCreatedComponents } from "./events/push.js";
+import { starCreatedComponents } from "./events/star.js";
 
 interface Env {
 	GITHUB_WEBHOOK_SECRET: string;
