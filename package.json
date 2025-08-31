@@ -7,7 +7,7 @@
 		"lint": "biome check",
 		"format": "biome check --write",
 		"dev": "wrangler dev",
-		"deploy": "wrangler deploy && sentry-wizard --platform sourcemaps --saas --org thatskyapplication --project github-discord",
+		"deploy": "wrangler deploy && sentry-wizard --integration sourcemaps --saas --org thatskyapplication --project github-discord",
 		"update": "pnpm update --interactive --latest"
 	},
 	"dependencies": {
