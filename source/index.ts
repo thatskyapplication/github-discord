@@ -13,6 +13,7 @@ import type {
 	WebhookEvent,
 	WebhookEventName,
 } from "@octokit/webhooks-types";
+import { withSentry } from "@sentry/cloudflare";
 import { createComponents } from "../events/create.js";
 import { pushCreatedComponents } from "../events/push.js";
 import { starCreatedComponents } from "../events/star.js";
@@ -21,9 +22,10 @@ interface Env {
 	GITHUB_WEBHOOK_SERCET: string;
 	DISCORD_WEBHOOK_ID: string;
 	DISCORD_WEBHOOK_TOKEN: string;
+	SENTRY_DATA_SOURCE_NAME: string;
 }
 
-export default {
+export default withSentry((env) => ({ dsn: env.SENTRY_DATA_SOURCE_NAME, sendDefaultPii: true }), {
 	async fetch(request, env) {
 		if (request.method !== "POST") {
 			return new Response(null, { status: 405 });
@@ -104,4 +106,4 @@ export default {
 
 		return new Response(null, { status: 204 });
 	},
-} satisfies ExportedHandler<Env>;
+} satisfies ExportedHandler<Env>);

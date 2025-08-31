@@ -2,6 +2,7 @@
 name = "github-discord"
 main = "source/index.ts"
 compatibility_date = "2025-08-30"
+compatibility_flags = ["nodejs_als"]
 workers_dev = false
 routes = [{ pattern = "github-discord.thatskyapplication.com", custom_domain = true }]
 

@@ -7,18 +7,20 @@
 		"lint": "biome check",
 		"format": "biome check --write",
 		"dev": "wrangler dev",
-		"deploy": "wrangler deploy",
+		"deploy": "wrangler deploy && sentry-wizard --platform sourcemaps --saas --org thatskyapplication --project github-discord",
 		"update": "pnpm update --interactive --latest"
 	},
 	"dependencies": {
 		"@discordjs/core": "^2.2.1",
 		"@discordjs/rest": "^2.6.0",
-		"@octokit/webhooks": "^14.1.3"
+		"@octokit/webhooks": "^14.1.3",
+		"@sentry/cloudflare": "^10.8.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.2",
 		"@cloudflare/workers-types": "^4.20250830.0",
 		"@octokit/webhooks-types": "^7.6.1",
+		"@sentry/wizard": "^6.3.0",
 		"typescript": "^5.9.2",
 		"wrangler": "^4.33.1"
 	}
