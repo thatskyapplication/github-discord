@@ -9,8 +9,8 @@ export function pushCreatedComponents(payload: PushEvent): APIMessageTopLevelCom
 	const branch = payload.ref.replace("refs/heads/", "");
 
 	const commits = payload.commits.map(
-		(commit) =>
-			`[\`${commit.id.slice(0, 7)}\`](${commit.url}) ${commit.committer.name}: ${commit.message} <t:${Date.parse(commit.timestamp) / 1000}:R>`,
+		({ id, url, committer, message, timestamp }) =>
+			`[\`${id.slice(0, 7)}\`](${url}) ${committer.name}: ${message.includes("\n") ? message.slice(0, message.indexOf("\n")) : message} <t:${Date.parse(timestamp) / 1000}:R>`,
 	);
 
 	const commitDescription =
