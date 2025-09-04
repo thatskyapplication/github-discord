@@ -3,6 +3,7 @@ import { REST } from "@discordjs/rest";
 import { Webhooks } from "@octokit/webhooks";
 import type {
 	CreateEvent,
+	DeleteEvent,
 	PushEvent,
 	StarEvent,
 	WebhookEvent,
@@ -10,6 +11,7 @@ import type {
 } from "@octokit/webhooks-types";
 import { withSentry } from "@sentry/cloudflare";
 import { createComponents } from "./events/create.js";
+import { deleteComponents } from "./events/delete.js";
 import { pushCreatedComponents } from "./events/push.js";
 import { starCreatedComponents } from "./events/star.js";
 
@@ -62,12 +64,14 @@ export default withSentry((env) => ({ dsn: env.SENTRY_DATA_SOURCE_NAME, sendDefa
 		} else if (eventType === "push") {
 			const pushEvent = payload as PushEvent;
 
-			// Deleting a branch triggers a push event with no commits.
+			// Deleting a branch or tag triggers a push event with no commits.
 			if (pushEvent.commits.length === 0) {
 				return new Response(null, { status: 204 });
 			}
 
 			components = pushCreatedComponents(pushEvent);
+		} else if (eventType === "delete") {
+			components = deleteComponents(payload as DeleteEvent);
 		} else if (eventType === "star") {
 			const starEvent = payload as StarEvent;
 
