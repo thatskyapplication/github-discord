@@ -7,26 +7,23 @@ import type { PushEvent } from "@octokit/webhooks-types";
 
 export function pushCreatedComponents(payload: PushEvent): APIMessageTopLevelComponent[] {
 	const branch = payload.ref.replace("refs/heads/", "");
-
-	const commits = payload.commits.map(
-		({ id, url, committer, message, timestamp }) =>
-			`[\`${id.slice(0, 7)}\`](${url}) ${committer.name}: ${message.includes("\n") ? message.slice(0, message.indexOf("\n")) : message} <t:${Date.parse(timestamp) / 1000}:R>`,
-	);
-
-	const commitDescription =
-		commits.length > 1
-			? `[${payload.before.slice(0, 7)}...${payload.after.slice(0, 7)}](${payload.compare})\n${commits.join("\n")}`
-			: commits[0]!;
-
 	let message = `[${payload.sender.name ?? payload.sender.login}](${payload.sender.html_url})`;
 
 	if (payload.forced) {
 		message += ` force-pushed [${payload.repository.name}:${branch}](${payload.repository.html_url}) to \`${payload.after.slice(0, 7)}\`.`;
 	} else {
-		message += ` committed to [${payload.repository.name}:${branch}](${payload.repository.html_url}).`;
-	}
+		const commits = payload.commits.map(
+			({ id, url, committer, message, timestamp }) =>
+				`[\`${id.slice(0, 7)}\`](${url}) ${committer.name}: ${message.includes("\n") ? message.slice(0, message.indexOf("\n")) : message} <t:${Date.parse(timestamp) / 1000}:R>`,
+		);
 
-	message += `\n${commitDescription}`;
+		const commitDescription =
+			commits.length > 1
+				? `[${payload.before.slice(0, 7)}...${payload.after.slice(0, 7)}](${payload.compare})\n${commits.join("\n")}`
+				: commits[0]!;
+
+		message += ` committed to [${payload.repository.name}:${branch}](${payload.repository.html_url}).\n${commitDescription}`;
+	}
 
 	return [
 		{
