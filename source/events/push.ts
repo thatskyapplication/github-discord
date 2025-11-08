@@ -6,7 +6,7 @@ import {
 import type { PushEvent } from "@octokit/webhooks-types";
 
 export function pushCreatedComponents(payload: PushEvent): APIMessageTopLevelComponent[] {
-	const ref = payload.ref.replace("refs/heads/", "");
+	const ref = payload.ref.replace("refs/heads/", "").replace("refs/tags/", "");
 	let message = `[${payload.sender.name ?? payload.sender.login}](${payload.sender.html_url})`;
 
 	if (payload.forced) {
