@@ -6,11 +6,11 @@ import {
 import type { PushEvent } from "@octokit/webhooks-types";
 
 export function pushCreatedComponents(payload: PushEvent): APIMessageTopLevelComponent[] {
-	const branch = payload.ref.replace("refs/heads/", "");
+	const ref = payload.ref.replace("refs/heads/", "");
 	let message = `[${payload.sender.name ?? payload.sender.login}](${payload.sender.html_url})`;
 
 	if (payload.forced) {
-		message += ` force-pushed [${payload.repository.name}:${branch}](${payload.repository.html_url}) to \`${payload.after.slice(0, 7)}\`.`;
+		message += ` force-pushed [${payload.repository.name}:${ref}](${payload.repository.html_url}) to \`${payload.after.slice(0, 7)}\`.`;
 	} else {
 		const commits = payload.commits.map(
 			({ id, url, committer, message, timestamp }) =>
@@ -22,7 +22,7 @@ export function pushCreatedComponents(payload: PushEvent): APIMessageTopLevelCom
 				? `[${payload.before.slice(0, 7)}...${payload.after.slice(0, 7)}](${payload.compare})\n${commits.join("\n")}`
 				: commits[0]!;
 
-		message += ` committed to [${payload.repository.name}:${branch}](${payload.repository.html_url}).\n${commitDescription}`;
+		message += ` committed to [${payload.repository.name}:${ref}](${payload.repository.html_url}).\n${commitDescription}`;
 	}
 
 	return [
