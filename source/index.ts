@@ -65,7 +65,8 @@ export default withSentry((env) => ({ dsn: env.SENTRY_DATA_SOURCE_NAME, sendDefa
 			const pushEvent = payload as PushEvent;
 
 			// Deleting a branch or tag triggers a push event with no commits.
-			if (pushEvent.commits.length === 0) {
+			// Allow force-pushes.
+			if (pushEvent.commits.length === 0 && !pushEvent.forced) {
 				return new Response(null, { status: 204 });
 			}
 
