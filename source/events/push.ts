@@ -12,15 +12,23 @@ export function pushCreatedComponents(payload: PushEvent): APIMessageTopLevelCom
 	if (payload.forced) {
 		message += ` force-pushed [${payload.repository.name}:${ref}](${payload.repository.html_url}) to \`${payload.after.slice(0, 7)}\`.`;
 	} else {
-		const commits = payload.commits.map(
-			({ id, url, committer, message, timestamp }) =>
-				`[\`${id.slice(0, 7)}\`](${url}) ${committer.name}: ${message.includes("\n") ? message.slice(0, message.indexOf("\n")) : message} <t:${Date.parse(timestamp) / 1000}:R>`,
-		);
+		let commits = "";
+
+		for (const { id, url, committer, message, timestamp } of payload.commits) {
+			commits += `[\`${id.slice(0, 7)}\`](${url}) ${committer.name}: ${message.includes("\n") ? message.slice(0, message.indexOf("\n")) : message} <t:${Date.parse(timestamp) / 1000}:R>`;
+
+			if (commits.length >= 1_000) {
+				commits += "\n...and more.";
+				break;
+			}
+
+			commits += "\n";
+		}
 
 		const commitDescription =
-			commits.length > 1
-				? `[${payload.before.slice(0, 7)}...${payload.after.slice(0, 7)}](${payload.compare})\n${commits.join("\n")}`
-				: commits[0]!;
+			payload.commits.length > 1
+				? `[${payload.before.slice(0, 7)}...${payload.after.slice(0, 7)}](${payload.compare})\n${commits}`
+				: commits;
 
 		message += ` committed to [${payload.repository.name}:${ref}](${payload.repository.html_url}).\n${commitDescription}`;
 	}
