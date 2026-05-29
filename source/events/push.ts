@@ -14,8 +14,8 @@ export function pushCreatedComponents(payload: PushEvent): APIMessageTopLevelCom
 	} else {
 		let commits = "";
 
-		for (const { id, url, committer, message, timestamp } of payload.commits) {
-			commits += `[\`${id.slice(0, 7)}\`](${url}) ${committer.name}: ${message.includes("\n") ? message.slice(0, message.indexOf("\n")) : message} <t:${Date.parse(timestamp) / 1000}:R>`;
+		for (const { id, url, author, message, timestamp } of payload.commits) {
+			commits += `[\`${id.slice(0, 7)}\`](${url}) ${author.username ?? author.name}: ${message.includes("\n") ? message.slice(0, message.indexOf("\n")) : message} <t:${Date.parse(timestamp) / 1000}:R>`;
 
 			if (commits.length >= 1_000) {
 				commits += "\n...and more.";
