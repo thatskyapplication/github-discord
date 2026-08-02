@@ -36,6 +36,22 @@ export default withSentry(
 			}
 
 			const eventType = request.headers.get("x-github-event") as WebhookEventName;
+			const signature = request.headers.get("x-hub-signature-256");
+			const text = await request.text();
+			const webhooks = new Webhooks({ secret: env.GITHUB_WEBHOOK_SECRET });
+
+			if (!signature) {
+				return new Response(null, { status: 401 });
+			}
+
+			try {
+				if (!(await webhooks.verify(text, signature))) {
+					return new Response(null, { status: 401 });
+				}
+			} catch (error) {
+				console.error(error);
+				return new Response(null, { status: 401 });
+			}
 
 			if (eventType === "ping") {
 				await new API(new REST()).webhooks.execute(
@@ -45,17 +61,6 @@ export default withSentry(
 				);
 
 				return new Response(null, { status: 204 });
-			}
-
-			const signature = request.headers.get("x-hub-signature-256");
-			const text = await request.text();
-			const webhooks = new Webhooks({ secret: env.GITHUB_WEBHOOK_SECRET });
-
-			try {
-				await webhooks.verify(text, signature!);
-			} catch (error) {
-				console.error(error);
-				return new Response(null, { status: 401 });
 			}
 
 			const payload = JSON.parse(text) as WebhookEvent;
