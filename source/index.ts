@@ -14,8 +14,8 @@ import type {
 import { withSentry } from "@sentry/cloudflare";
 import { createComponents } from "./events/create.js";
 import { deleteComponents } from "./events/delete.js";
-import { issueClosedComponents } from "./events/issue.js";
-import { pullRequestClosedComponents } from "./events/pull-request.js";
+import { issueComponents } from "./events/issue.js";
+import { pullRequestComponents } from "./events/pull-request.js";
 import { pushCreatedComponents } from "./events/push.js";
 import { starCreatedComponents } from "./events/star.js";
 
@@ -93,19 +93,19 @@ export default withSentry(
 			} else if (eventType === "issues") {
 				const issuesEvent = payload as IssuesEvent;
 
-				if (issuesEvent.action !== "closed") {
+				if (issuesEvent.action !== "closed" && issuesEvent.action !== "opened") {
 					return new Response(null, { status: 204 });
 				}
 
-				components = issueClosedComponents(issuesEvent);
+				components = issueComponents(issuesEvent);
 			} else if (eventType === "pull_request") {
 				const pullRequestEvent = payload as PullRequestEvent;
 
-				if (pullRequestEvent.action !== "closed") {
+				if (pullRequestEvent.action !== "closed" && pullRequestEvent.action !== "opened") {
 					return new Response(null, { status: 204 });
 				}
 
-				components = pullRequestClosedComponents(pullRequestEvent);
+				components = pullRequestComponents(pullRequestEvent);
 			} else if (eventType === "star") {
 				const starEvent = payload as StarEvent;
 
