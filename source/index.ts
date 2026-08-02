@@ -58,6 +58,7 @@ export default withSentry(
 					env.DISCORD_WEBHOOK_ID,
 					env.DISCORD_WEBHOOK_TOKEN,
 					{ allowed_mentions: { parse: [] }, content: "Ping!" },
+					{ signal: AbortSignal.timeout(9_000) },
 				);
 
 				return new Response(null, { status: 204 });
@@ -106,6 +107,7 @@ export default withSentry(
 					flags: MessageFlags.IsComponentsV2,
 					with_components: true,
 				},
+				{ signal: AbortSignal.timeout(9_000) },
 			);
 
 			return new Response(null, { status: 204 });
