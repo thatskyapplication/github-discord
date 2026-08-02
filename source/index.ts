@@ -77,9 +77,9 @@ export default withSentry(
 			} else if (eventType === "push") {
 				const pushEvent = payload as PushEvent;
 
-				// Deleting a branch or tag triggers a push event with no commits.
-				// Allow force-pushes.
-				if (pushEvent.commits.length === 0 && !pushEvent.forced) {
+				// Delete events have their own notification. A new ref with no unique
+				// commits is already announced by its create event.
+				if (pushEvent.deleted || (pushEvent.created && pushEvent.commits.length === 0)) {
 					return new Response(null, { status: 204 });
 				}
 

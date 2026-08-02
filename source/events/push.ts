@@ -5,32 +5,76 @@ import {
 } from "@discordjs/core/http-only";
 import type { PushEvent } from "@octokit/webhooks-types";
 
+const COMMIT_DESCRIPTION_TARGET_LENGTH = 1_000 as const;
+const REVISION_SHA_PATTERN = /^[\da-f]{8,40}/i;
+
+function abbreviateRevision(revision: string): string {
+	const sha = REVISION_SHA_PATTERN.exec(revision)?.[0];
+
+	if (sha === undefined) {
+		return revision;
+	}
+
+	return `${sha.slice(0, 7)}${revision.slice(sha.length)}`;
+}
+
+function createdComparisonLabel(compare: string): string {
+	try {
+		const marker = "/compare/";
+		const pathname = new URL(compare).pathname;
+		const markerIndex = pathname.indexOf(marker);
+
+		if (markerIndex === -1) {
+			return "Compare pushed commits";
+		}
+
+		const range = decodeURIComponent(pathname.slice(markerIndex + marker.length));
+		const revisions = range.split("...");
+
+		if (revisions.length !== 2 || revisions[0] === "" || revisions[1] === "") {
+			return "Compare pushed commits";
+		}
+
+		return revisions.map(abbreviateRevision).join("...");
+	} catch {
+		return "Compare pushed commits";
+	}
+}
+
 export function pushCreatedComponents(payload: PushEvent): APIMessageTopLevelComponent[] {
-	const ref = payload.ref.replace("refs/heads/", "").replace("refs/tags/", "");
+	const ref = payload.ref.replace(/^refs\/(?:heads|tags)\//, "");
 	let message = `[${payload.sender.name ?? payload.sender.login}](${payload.sender.html_url})`;
 
 	if (payload.forced) {
 		message += ` force-pushed [${payload.repository.name}:${ref}](${payload.repository.html_url}) to \`${payload.after.slice(0, 7)}\`.`;
 	} else {
-		let commits = "";
+		const commitLines: string[] = [];
+		let commitDescriptionLength = 0;
 
 		for (const { id, url, author, message, timestamp } of payload.commits) {
-			commits += `[\`${id.slice(0, 7)}\`](${url}) ${author.username ?? author.name}: ${message.includes("\n") ? message.slice(0, message.indexOf("\n")) : message} <t:${Date.parse(timestamp) / 1000}:R>`;
-
-			if (commits.length >= 1_000) {
-				commits += "\n...and more.";
+			if (commitDescriptionLength >= COMMIT_DESCRIPTION_TARGET_LENGTH) {
 				break;
 			}
 
-			commits += "\n";
+			const title = message.split("\n", 1)[0] ?? "";
+			const line = `[\`${id.slice(0, 7)}\`](${url}) ${author.username ?? author.name}: ${title} <t:${Math.floor(Date.parse(timestamp) / 1_000)}:R>`;
+			commitLines.push(line);
+			commitDescriptionLength += line.length + 1;
 		}
 
-		const commitDescription =
-			payload.commits.length > 1
-				? `[${payload.before.slice(0, 7)}...${payload.after.slice(0, 7)}](${payload.compare})\n${commits}`
-				: commits;
+		let commits = commitLines.join("\n");
 
-		message += ` committed to [${payload.repository.name}:${ref}](${payload.repository.html_url}).\n${commitDescription}`;
+		if (commitLines.length < payload.commits.length) {
+			commits += "\n...and more.";
+		}
+
+		const comparisonLabel = payload.created
+			? createdComparisonLabel(payload.compare)
+			: `${payload.before.slice(0, 7)}...${payload.after.slice(0, 7)}`;
+		const commitDescription =
+			payload.commits.length > 1 ? `[${comparisonLabel}](${payload.compare})\n${commits}` : commits;
+
+		message += ` pushed to [${payload.repository.name}:${ref}](${payload.repository.html_url}).\n${commitDescription}`;
 	}
 
 	return [
