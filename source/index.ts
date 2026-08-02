@@ -4,6 +4,7 @@ import { Webhooks } from "@octokit/webhooks";
 import type {
 	CreateEvent,
 	DeleteEvent,
+	PullRequestEvent,
 	PushEvent,
 	StarEvent,
 	WebhookEvent,
@@ -12,6 +13,7 @@ import type {
 import { withSentry } from "@sentry/cloudflare";
 import { createComponents } from "./events/create.js";
 import { deleteComponents } from "./events/delete.js";
+import { pullRequestClosedComponents } from "./events/pull-request.js";
 import { pushCreatedComponents } from "./events/push.js";
 import { starCreatedComponents } from "./events/star.js";
 
@@ -86,6 +88,14 @@ export default withSentry(
 				components = pushCreatedComponents(pushEvent);
 			} else if (eventType === "delete") {
 				components = deleteComponents(payload as DeleteEvent);
+			} else if (eventType === "pull_request") {
+				const pullRequestEvent = payload as PullRequestEvent;
+
+				if (pullRequestEvent.action !== "closed") {
+					return new Response(null, { status: 204 });
+				}
+
+				components = pullRequestClosedComponents(pullRequestEvent);
 			} else if (eventType === "star") {
 				const starEvent = payload as StarEvent;
 
