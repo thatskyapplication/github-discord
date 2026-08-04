@@ -26,10 +26,17 @@ export function pullRequestComponents(
 		const { body } = payload.pull_request;
 
 		if (body !== null && body.trim().length > 0) {
-			container.components.push({
-				type: ComponentType.TextDisplay,
-				content: truncateContent(body),
-			});
+			container.components.push(
+				{
+					type: ComponentType.Separator,
+					divider: true,
+					spacing: SeparatorSpacingSize.Small,
+				},
+				{
+					type: ComponentType.TextDisplay,
+					content: truncateContent(body),
+				},
+			);
 		}
 	}
 

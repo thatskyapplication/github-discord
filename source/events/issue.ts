@@ -25,10 +25,17 @@ export function issueComponents(
 		const { body } = payload.issue;
 
 		if (body !== null && body.trim().length > 0) {
-			container.components.push({
-				type: ComponentType.TextDisplay,
-				content: truncateContent(body),
-			});
+			container.components.push(
+				{
+					type: ComponentType.Separator,
+					divider: true,
+					spacing: SeparatorSpacingSize.Small,
+				},
+				{
+					type: ComponentType.TextDisplay,
+					content: truncateContent(body),
+				},
+			);
 		}
 	}
 
