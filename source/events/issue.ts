@@ -21,6 +21,7 @@ export function issueComponents(
 	};
 
 	if (payload.action === "opened") {
+		container.accent_color = 0xd97706;
 		const { body } = payload.issue;
 
 		if (body !== null && body.trim().length > 0) {
